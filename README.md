@@ -6,13 +6,6 @@ descontos e cancelamentos exclusivos do gerente e auditoria persistente no Mongo
 
 **Tecnologias:** Java 21 · Spring Boot 3.4 · Spring Security 6 · Spring Data MongoDB · Thymeleaf · JUnit 5/Mockito
 
-## 🎥 Vídeo de demonstração
-
-[Assistir no Google Drive](https://drive.google.com/file/d/1SryXYi03YWa6k3MM7p2pSSD3DcNatxds/view?usp=sharing)
-
-Autenticação dos três perfis, bloqueio de operações não autorizadas, entrada, transições e saída de pedidos,
-cancelamento e desconto pelo GERENTE, alteração de dados de cliente e consulta à auditoria.
-
 ---
 
 ## 1. Como executar
