@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Home</title>
+</head>
+<body>
+
+<div class="container-fluid vh-100 d-flex justify-content-center align-items-center" th:fragment="content">
+    <div class="text-center">
+        <h1>Bem-vindo, <span sec:authentication="name">usuário</span>!</h1>
+        <p class="text-muted">
+            <span sec:authorize="hasRole('ADMIN')">Perfil ADMIN: administre usuários, consulte pedidos e a auditoria.</span>
+            <span sec:authorize="hasRole('GERENTE')">Perfil GERENTE: gerencie pedidos, aplique descontos, cancele pedidos e consulte a auditoria.</span>
+            <span sec:authorize="hasRole('ATENDENTE')">Perfil ATENDENTE: cadastre clientes, registre pedidos e acompanhe o andamento.</span>
+        </p>
+        <img th:src="@{/images/logo.png}" alt="Logo" width="400" height="400">
+    </div>
+</div>
+
+</body>
+</html>

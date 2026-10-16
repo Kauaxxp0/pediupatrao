@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Auditoria</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold mb-0">
+            <i class="bi bi-shield-check me-2 text-primary"></i>Auditoria
+        </h2>
+        <a th:href="@{/auditoria(verificar=true)}" class="btn btn-outline-dark">
+            <i class="bi bi-fingerprint me-1"></i> Verificar integridade
+        </a>
+    </div>
+
+    <div th:if="${verificacao != null}" class="alert"
+         th:classappend="${verificacao.integro} ? 'alert-success' : 'alert-danger'">
+        <i class="bi me-1" th:classappend="${verificacao.integro} ? 'bi-patch-check-fill' : 'bi-exclamation-octagon-fill'"></i>
+        <span th:text="${verificacao.mensagem}"></span>
+    </div>
+
+    <p class="text-muted small">
+        Registros somente leitura: não podem ser alterados nem excluídos pela aplicação. Cada registro guarda o
+        hash do anterior, permitindo detectar adulterações feitas diretamente no banco.
+        <span sec:authorize="hasRole('GERENTE')">Telefones aparecem mascarados para o seu perfil.</span>
+    </p>
+
+    <!-- Filtros -->
+    <form th:action="@{/auditoria}" method="get" class="card card-body shadow-sm mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small mb-1" for="entidade">Entidade</label>
+                <select id="entidade" name="entidade" class="form-select form-select-sm">
+                    <option value="">Todas</option>
+                    <option th:each="e : ${ {'Pedido','Cliente','Usuario'} }" th:value="${e}" th:text="${e}"
+                            th:selected="${filtro.entidade == e}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small mb-1" for="operacao">Operação</label>
+                <select id="operacao" name="operacao" class="form-select form-select-sm">
+                    <option value="">Todas</option>
+                    <option th:each="op : ${operacoes}" th:value="${op}" th:text="${op.descricao}"
+                            th:selected="${filtro.operacao == op}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-1" for="usuario">Usuário</label>
+                <input id="usuario" name="usuario" class="form-control form-control-sm" th:value="${filtro.usuario}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-1" for="entidadeId">ID da entidade</label>
+                <input id="entidadeId" name="entidadeId" class="form-control form-control-sm" th:value="${filtro.entidadeId}">
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small mb-1" for="de">De</label>
+                <input id="de" type="date" name="de" class="form-control form-control-sm" th:value="${filtro.de}">
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small mb-1" for="ate">Até</label>
+                <input id="ate" type="date" name="ate" class="form-control form-control-sm" th:value="${filtro.ate}">
+            </div>
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel"></i> Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-3">#</th>
+                        <th>Data e hora</th>
+                        <th>Usuário</th>
+                        <th>Operação</th>
+                        <th>Entidade</th>
+                        <th>Campos alterados (anterior → novo)</th>
+                        <th>Justificativa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${pagina.content.isEmpty()}">
+                        <td colspan="7" class="text-center text-muted py-5">Nenhum registro encontrado.</td>
+                    </tr>
+                    <tr th:each="r : ${pagina.content}">
+                        <td class="ps-3 text-muted small" th:text="${r.sequencia}"></td>
+                        <td class="small text-nowrap" th:text="${#temporals.format(r.dataHora, 'dd/MM/yyyy — HH:mm:ss')}"></td>
+                        <td class="small">
+                            <strong th:text="${r.usuario}"></strong><br>
+                            <span class="badge bg-secondary" th:text="${r.perfil}"></span>
+                        </td>
+                        <td class="small" th:text="${r.operacao.descricao}"></td>
+                        <td class="small">
+                            <span th:text="${r.entidade}"></span><br>
+                            <a class="font-monospace text-muted" style="font-size: .75rem"
+                               th:href="${r.entidade == 'Pedido'} ? @{/pedidos/{id}(id=${r.entidadeId})} : @{/auditoria(entidade=${r.entidade}, entidadeId=${r.entidadeId})}"
+                               th:text="${r.entidadeId}"></a>
+                        </td>
+                        <td class="small">
+                            <div th:each="c : ${r.alteracoes}">
+                                <code th:text="${c.campo}"></code>:
+                                <span class="text-danger text-decoration-line-through" th:text="${c.valorAnterior}" th:if="${c.valorAnterior != null}"></span>
+                                <span class="text-muted" th:if="${c.valorAnterior == null}">∅</span>
+                                →
+                                <span class="text-success" th:text="${c.valorNovo}" th:if="${c.valorNovo != null}"></span>
+                                <span class="text-muted" th:if="${c.valorNovo == null}">∅</span>
+                            </div>
+                        </td>
+                        <td class="small" th:text="${r.justificativa}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center small" th:if="${pagina.totalPages > 1}">
+            <span class="text-muted" th:text="'Página ' + ${pagina.number + 1} + ' de ' + ${pagina.totalPages} + ' (' + ${pagina.totalElements} + ' registros)'"></span>
+            <div>
+                <a class="btn btn-sm btn-outline-secondary" th:if="${pagina.hasPrevious()}"
+                   th:href="@{/auditoria(entidade=${filtro.entidade}, entidadeId=${filtro.entidadeId}, usuario=${filtro.usuario}, operacao=${filtro.operacao}, de=${filtro.de}, ate=${filtro.ate}, pagina=${pagina.number - 1})}">Anterior</a>
+                <a class="btn btn-sm btn-outline-secondary" th:if="${pagina.hasNext()}"
+                   th:href="@{/auditoria(entidade=${filtro.entidade}, entidadeId=${filtro.entidadeId}, usuario=${filtro.usuario}, operacao=${filtro.operacao}, de=${filtro.de}, ate=${filtro.ate}, pagina=${pagina.number + 1})}">Próxima</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

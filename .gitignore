@@ -1,1 +1,6 @@
-/build/
+/target/
+/nbproject/private/
+*.log
+
+# Roteiro pessoal do video
+ROTEIRO-VIDEO.txt

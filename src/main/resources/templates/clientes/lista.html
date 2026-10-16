@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Lista de Clientes</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">
+            <i class="bi bi-person-raised-hand me-2 text-primary"></i>Clientes
+        </h2>
+        <a th:href="@{/clientes/novo}" class="btn btn-primary" sec:authorize="hasRole('ATENDENTE')">
+            <i class="bi bi-plus-lg me-1"></i> Novo Cliente
+        </a>
+    </div>
+
+    <!-- Tabela de clientes -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Nome</th>
+                        <th>Telefone</th>
+                        <th>Endereço</th>
+                        <th class="text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(clientes)}">
+                        <td colspan="4" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            Nenhum cliente cadastrado.
+                        </td>
+                    </tr>
+                    <tr th:each="cliente : ${clientes}">
+                        <td class="ps-4" th:text="${cliente.nome}"></td>
+                        <td th:text="${cliente.telefone}"></td>
+                        <td th:text="${cliente.enderecoFormatado} ?: '—'"></td>
+                        <td class="text-end pe-4 text-nowrap">
+                            <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}" class="btn btn-sm btn-outline-primary me-1"
+                               sec:authorize="hasRole('ATENDENTE')">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </a>
+                            <a th:href="@{/auditoria(entidade='Cliente', entidadeId=${cliente.id})}" class="btn btn-sm btn-outline-secondary me-1"
+                               sec:authorize="hasRole('GERENTE')">
+                                <i class="bi bi-shield-check"></i> Auditoria
+                            </a>
+                            <form th:action="@{/clientes/excluir/{id}(id=${cliente.id})}" method="post" class="d-inline"
+                                  sec:authorize="hasRole('GERENTE')"
+                                  onsubmit="return confirm('Tem certeza que deseja excluir este cliente?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash-fill"></i> Excluir
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted small" th:if="${!#lists.isEmpty(clientes)}">
+            Total: <strong th:text="${#lists.size(clientes)}"></strong> cliente(s)
+        </div>
+    </div>
+</div>
+</body>
+</html>
