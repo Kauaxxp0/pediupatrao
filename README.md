@@ -6,6 +6,13 @@ descontos e cancelamentos exclusivos do gerente e auditoria persistente no Mongo
 
 **Tecnologias:** Java 21 · Spring Boot 3.4 · Spring Security 6 · Spring Data MongoDB · Thymeleaf · JUnit 5/Mockito
 
+## 🎥 Vídeo de demonstração
+
+[Assistir no Google Drive](https://drive.google.com/file/d/1SryXYi03YWa6k3MM7p2pSSD3DcNatxds/view?usp=sharing)
+
+Autenticação dos três perfis, bloqueio de operações não autorizadas, entrada, transições e saída de pedidos,
+cancelamento e desconto pelo GERENTE, alteração de dados de cliente e consulta à auditoria.
+
 ---
 
 ## 1. Como executar
@@ -187,11 +194,3 @@ fetch('/api/usuarios').then(r => console.log(r.status));
 ```
 
 Também é possível digitar a URL de uma tela proibida (ex.: `/usuarios` logado como GERENTE) e ver a página **403**.
-
-### Roteiro sugerido para o vídeo
-1. Login com `atendente01`: cadastrar cliente, registrar pedido, avançar até **Pronto**; tentar cancelar pela API (403).
-2. Editar o endereço e o telefone do cliente.
-3. Login com `gerente01`: tentar desconto de 25% (recusado), aplicar 10%, mover para **Saiu para entrega**
-   (saída registrada), tentar cancelar após a saída (recusado), cancelar outro pedido com justificativa.
-4. Login com `admin`: tentar desconto/cancelamento pela API (403), criar usuário, tentar alterar o próprio perfil (recusado).
-5. Abrir **Auditoria** (ADMIN e GERENTE), filtrar por cliente/pedido e clicar em **Verificar integridade**.
