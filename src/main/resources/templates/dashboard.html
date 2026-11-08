@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+<div th:fragment="content" id="dashboard">
+
+    <style>
+        #dashboard .kpi { border: 0; border-left: 4px solid var(--kpi-cor, #0d6efd); }
+        #dashboard .kpi .valor { font-size: clamp(1.05rem, 1.35vw, 1.5rem); font-weight: 700; line-height: 1.3; white-space: nowrap; }
+        #dashboard .kpi .rotulo { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: #6c757d; }
+        #dashboard .variacao { font-size: .8rem; }
+        #dashboard .card-grafico { position: relative; min-height: 320px; }
+        #dashboard .area-grafico { position: relative; height: 260px; }
+        #dashboard .carregando {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, .7); z-index: 2; border-radius: inherit;
+        }
+        #dashboard .estado { color: #6c757d; text-align: center; padding: 2.5rem 1rem; }
+        #dashboard .estado.erro { color: #dc3545; }
+        #dashboard .barra-tipo { height: 8px; }
+    </style>
+
+    <!-- Cabeçalho -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2 text-primary"></i>Dashboard</h2>
+            <small class="text-muted">Desempenho das vendas e situação dos pedidos</small>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <small class="text-muted" id="ultimaAtualizacao">Carregando…</small>
+            <div class="form-check form-switch mb-0" title="Atualiza os dados a cada 60 segundos">
+                <input class="form-check-input" type="checkbox" id="autoAtualizar" checked>
+                <label class="form-check-label small" for="autoAtualizar">Auto (60s)</label>
+            </div>
+            <button class="btn btn-outline-primary btn-sm" id="btnAtualizar">
+                <i class="bi bi-arrow-clockwise"></i> Atualizar
+            </button>
+        </div>
+    </div>
+
+    <!-- RF05 — Filtros -->
+    <form class="card card-body shadow-sm mb-3 py-2" id="formFiltros">
+        <div class="row g-2 align-items-end">
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="fInicio">Data inicial</label>
+                <input type="date" class="form-control form-control-sm" id="fInicio" required>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="fFim">Data final</label>
+                <input type="date" class="form-control form-control-sm" id="fFim" required>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="fTipo">Tipo</label>
+                <select class="form-select form-select-sm" id="fTipo"><option value="">Todos</option></select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="fStatus">Status</label>
+                <select class="form-select form-select-sm" id="fStatus"><option value="">Todos</option></select>
+            </div>
+            <div class="col-12 col-md-4 d-flex flex-wrap gap-1 justify-content-md-end">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Atalhos de período">
+                    <button type="button" class="btn btn-outline-secondary" data-atalho="hoje">Hoje</button>
+                    <button type="button" class="btn btn-outline-secondary" data-atalho="7">7 dias</button>
+                    <button type="button" class="btn btn-outline-secondary" data-atalho="30">30 dias</button>
+                    <button type="button" class="btn btn-outline-secondary" data-atalho="mes">Este mês</button>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel"></i> Aplicar</button>
+                <button type="button" class="btn btn-link btn-sm" id="btnLimpar">Limpar</button>
+            </div>
+        </div>
+        <div class="alert alert-danger py-1 px-2 small mt-2 mb-0 d-none" id="erroFiltro"></div>
+    </form>
+
+    <!-- RF01 — Indicadores -->
+    <div class="row g-3 mb-3" id="kpis">
+        <div class="col-6 col-md-4 col-xxl-2"><div class="card kpi shadow-sm h-100" style="--kpi-cor:#198754"><div class="card-body py-2">
+            <div class="rotulo">Faturamento</div><div class="valor" id="kFaturamento">—</div><div class="variacao" id="vFaturamento"></div>
+        </div></div></div>
+        <div class="col-6 col-md-4 col-xxl-2"><div class="card kpi shadow-sm h-100" style="--kpi-cor:#0d6efd"><div class="card-body py-2">
+            <div class="rotulo">Pedidos</div><div class="valor" id="kPedidos">—</div><div class="variacao" id="vPedidos"></div>
+        </div></div></div>
+        <div class="col-6 col-md-4 col-xxl-2"><div class="card kpi shadow-sm h-100" style="--kpi-cor:#6f42c1"><div class="card-body py-2">
+            <div class="rotulo">Ticket médio</div><div class="valor" id="kTicket">—</div><div class="variacao" id="vTicket"></div>
+        </div></div></div>
+        <div class="col-6 col-md-4 col-xxl-2"><div class="card kpi shadow-sm h-100" style="--kpi-cor:#dc3545"><div class="card-body py-2">
+            <div class="rotulo">Cancelamentos</div><div class="valor" id="kCancelados">—</div><div class="variacao text-muted" id="vCancelados"></div>
+        </div></div></div>
+        <div class="col-6 col-md-4 col-xxl-2"><div class="card kpi shadow-sm h-100" style="--kpi-cor:#fd7e14"><div class="card-body py-2">
+            <div class="rotulo">Descontos concedidos</div><div class="valor" id="kDescontos">—</div><div class="variacao text-muted" id="vItens"></div>
+        </div></div></div>
+        <div class="col-6 col-md-4 col-xxl-2"><div class="card kpi shadow-sm h-100" style="--kpi-cor:#0dcaf0"><div class="card-body py-2">
+            <div class="rotulo">Em andamento</div><div class="valor" id="kAndamento">—</div>
+            <div class="variacao text-muted" id="vTipo"></div>
+            <div class="progress barra-tipo mt-1" title="Entrega x Retirada">
+                <div class="progress-bar bg-primary" id="barEntrega" style="width:0%"></div>
+                <div class="progress-bar bg-secondary" id="barRetirada" style="width:0%"></div>
+            </div>
+        </div></div></div>
+    </div>
+    <div class="alert alert-danger d-none" id="erroResumo"></div>
+
+    <!-- RF02 — Vendas no período e RF03 — Situação -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-8">
+            <div class="card shadow-sm card-grafico h-100" id="cardVendas">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                    <span class="fw-medium"><i class="bi bi-graph-up me-1"></i> Vendas no período</span>
+                    <select class="form-select form-select-sm w-auto" id="fAgrupamento" aria-label="Agrupamento">
+                        <option value="DIA">Por dia</option><option value="SEMANA">Por semana</option><option value="MES">Por mês</option>
+                    </select>
+                </div>
+                <div class="card-body"><div class="area-grafico"><canvas id="gVendas"></canvas></div></div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm card-grafico h-100" id="cardStatus">
+                <div class="card-header bg-white fw-medium"><i class="bi bi-pie-chart me-1"></i> Situação dos pedidos</div>
+                <div class="card-body">
+                    <div class="area-grafico" style="height:200px"><canvas id="gStatus"></canvas></div>
+                    <div class="d-flex justify-content-around text-center small mt-2">
+                        <div><div class="text-muted">Tempo até a saída</div><strong id="tSaida">—</strong></div>
+                        <div><div class="text-muted">Tempo até finalizar</div><strong id="tFinal">—</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RF02 — Horários e RF04 — Produtos -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm card-grafico h-100" id="cardHoras">
+                <div class="card-header bg-white fw-medium"><i class="bi bi-clock me-1"></i> Pedidos por horário</div>
+                <div class="card-body"><div class="area-grafico"><canvas id="gHoras"></canvas></div></div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm card-grafico h-100" id="cardProdutos">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                    <span class="fw-medium"><i class="bi bi-trophy me-1"></i> Produtos mais vendidos</span>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Ordenação do ranking">
+                        <input type="radio" class="btn-check" name="ordem" id="oQtd" value="QUANTIDADE" checked>
+                        <label class="btn btn-outline-secondary" for="oQtd">Quantidade</label>
+                        <input type="radio" class="btn-check" name="ordem" id="oValor" value="FATURAMENTO">
+                        <label class="btn btn-outline-secondary" for="oValor">Faturamento</label>
+                    </div>
+                </div>
+                <div class="card-body"><div class="area-grafico"><canvas id="gProdutos"></canvas></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RF03 — Pedidos recentes -->
+    <div class="card shadow-sm card-grafico mb-4" id="cardRecentes" style="min-height:0">
+        <div class="card-header bg-white fw-medium d-flex justify-content-between">
+            <span><i class="bi bi-list-ul me-1"></i> Pedidos recentes</span>
+            <a th:href="@{/pedidos}" class="small">Ver todos</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th class="ps-3">Entrada</th><th>Cliente</th><th>Tipo</th><th class="text-center">Itens</th>
+                            <th class="text-end">Total</th><th class="pe-3">Status</th></tr>
+                    </thead>
+                    <tbody id="tRecentes"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script th:src="@{/js/dashboard.js}"></script>
+</div>
+</body>
+</html>
