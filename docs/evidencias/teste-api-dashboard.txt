@@ -1,0 +1,48 @@
+﻿PediuPatrao - teste da API do dashboard (08/11/2026 12:10:31)
+
+=== Endpoints (GERENTE, periodo padrao: ultimos 30 dias) ===
+[OK    ] GET /api/dashboard/resumo                                  HTTP 200 (81 ms)
+         -> faturamento R$ 41.658,41 | 318 pedidos | ticket medio R$ 147,72 | cancelamento 11,3% | variacao 41,0%
+[OK    ] GET /api/dashboard/vendas?agrupamento=DIA                  HTTP 200 (44 ms)
+         -> 30 pontos na serie (dias sem venda aparecem com zero)
+[OK    ] GET /api/dashboard/vendas?agrupamento=SEMANA               HTTP 200 (44 ms)
+         -> 5 semanas
+[OK    ] GET /api/dashboard/vendas-por-hora                         HTTP 200 (46 ms)
+         -> horario de pico: 20h com 42 pedidos
+[OK    ] GET /api/dashboard/situacao-pedidos                        HTTP 200 (43 ms)
+         -> 318 pedidos, 7 em andamento, tempo medio ate a saida: 32 min
+[OK    ] GET /api/dashboard/produtos-mais-vendidos?limite=3         HTTP 200 (47 ms)
+         -> 1. Pizza Marguerita (134 un) | 2. Pizza Portuguesa (113 un) | 3. Pizza Quatro Queijos (92 un)
+[OK    ] GET .../produtos-mais-vendidos?ordenarPor=FATURAMENTO      HTTP 200 (44 ms)
+         -> 1o por faturamento: Pizza Marguerita (R$ 6.365,00)
+[OK    ] GET /api/dashboard/pedidos-recentes?limite=5               HTTP 200 (15 ms)
+         -> 5 pedidos retornados
+[OK    ] GET /api/dashboard/filtros                                 HTTP 200 (12 ms)
+         -> 7 status, 2 tipos de entrega, padrao 2026-10-10 a 2026-11-08
+
+=== Filtros (RF05) ===
+[OK    ] resumo com periodo de 7 dias (2026-11-02 a 2026-11-08)     HTTP 200 (30 ms)
+         -> 71 pedidos, faturamento R$ 9.957,94
+[OK    ] resumo filtrando tipoEntrega=RETIRADA                      HTTP 200 (35 ms)
+         -> entrega: 0 | retirada: 112
+[OK    ] resumo filtrando status=CANCELADO                          HTTP 200 (20 ms)
+         -> 36 pedidos cancelados, faturamento R$ 0,00 (cancelados nao faturam)
+
+=== Tratamento de erros (RF07) ===
+[OK    ] fim anterior ao inicio                                     HTTP 400 (28 ms)
+         -> A data final (fim) não pode ser anterior à data inicial (inicio).
+[OK    ] periodo maior que 366 dias                                 HTTP 400 (5 ms)
+         -> O período consultado não pode ultrapassar 366 dias.
+[OK    ] status inexistente (status=ENTREGUE)                       HTTP 400 (7 ms)
+         -> Valor inválido para o parâmetro 'status': ENTREGUE
+[OK    ] data em formato errado (inicio=08/11/2026)                 HTTP 400 (5 ms)
+         -> Valor inválido para o parâmetro 'inicio': 08/11/2026
+[OK    ] limite fora da faixa (limite=100)                          HTTP 400 (4 ms)
+         -> O parâmetro limite deve estar entre 1 e 50.
+
+=== Controle de acesso ===
+[OK    ] sem login                                                  HTTP 401 (3 ms)
+[OK    ] ATENDENTE tentando acessar o dashboard                     HTTP 403 (3 ms)
+         -> Acesso negado: seu perfil não tem permissão para esta operação.
+
+Resultado: 19 de 19 testes OK
