@@ -1,5 +1,7 @@
 # PediuPatrão — Controle de acesso, gestão de pedidos e auditoria
 
+> 🎥 **Vídeo de apresentação do Dashboard Administrativo:** https://youtu.be/tNrr3ASeoFM
+
 Atividade Prática M1 (Parte 2) — Engenharia de Software.
 Evolução do sistema **PediuPatrão** de uma pizzaria: perfis de acesso, fluxo controlado de pedidos,
 descontos e cancelamentos exclusivos do gerente e auditoria persistente no MongoDB.
