@@ -42,8 +42,18 @@ public class ApiExceptionHandler {
         return erro(HttpStatus.CONFLICT, "Registro duplicado.");
     }
 
-    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class,
-        MissingServletRequestParameterException.class})
+    @ExceptionHandler(ParametroInvalidoException.class)
+    public ResponseEntity<Map<String, Object>> parametroInvalido(ParametroInvalidoException e) {
+        return erro(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    /** Ex.: status=ABC ou inicio=31-12-2026; informa qual parâmetro está errado. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> tipoInvalido(MethodArgumentTypeMismatchException e) {
+        return erro(HttpStatus.BAD_REQUEST, "Valor inválido para o parâmetro '" + e.getName() + "': " + e.getValue());
+    }
+
+    @ExceptionHandler({HttpMessageNotReadableException.class, MissingServletRequestParameterException.class})
     public ResponseEntity<Map<String, Object>> requisicaoInvalida(Exception e) {
         return erro(HttpStatus.BAD_REQUEST, "Requisição inválida: verifique os campos e valores enviados.");
     }

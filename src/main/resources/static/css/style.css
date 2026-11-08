@@ -63,3 +63,12 @@ body {
         cursor: pointer;
     }
 }
+/* Menu lateral fixo ao rolar páginas longas (ex.: dashboard) */
+@media (min-width: 769px) {
+    aside {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        flex-shrink: 0;
+    }
+}
