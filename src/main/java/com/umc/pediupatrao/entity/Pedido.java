@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -49,6 +50,7 @@ public class Pedido {
     // Entrada
     private String registradoPor;
     private String registradoPorPerfil;
+    @Indexed // usado pelos filtros de período do dashboard
     private LocalDateTime dataHoraEntrada;
 
     // Saída (SAIU_PARA_ENTREGA ou RETIRADO)

@@ -63,6 +63,9 @@ public class SecurityConfig {
                         // Usuários e perfis: somente ADMIN
                         .requestMatchers("/usuarios/**", "/api/usuarios/**").hasRole(ADMIN)
 
+                        // Dashboard administrativo: ADMIN e GERENTE, somente leitura
+                        .requestMatchers(HttpMethod.GET, "/dashboard", "/api/dashboard/*").hasAnyRole(ADMIN, GERENTE)
+
                         // Auditoria: ADMIN e GERENTE, somente leitura (outros métodos caem no denyAll da API)
                         .requestMatchers(HttpMethod.GET, "/auditoria", "/api/auditoria", "/api/auditoria/verificar")
                         .hasAnyRole(ADMIN, GERENTE)
