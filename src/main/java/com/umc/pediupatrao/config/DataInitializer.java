@@ -12,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -25,6 +26,7 @@ public class DataInitializer {
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
 
     @Bean
+    @Order(1) // antes do DemoDataInitializer
     CommandLineRunner initDatabase(UsuarioRepository usuarios, ProdutoRepository produtos,
             PasswordEncoder encoder, @Value("${app.seed.senha-padrao}") String senhaPadrao) {
         return args -> {
