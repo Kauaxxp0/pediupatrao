@@ -4,7 +4,20 @@ Atividade Prática M1 (Parte 2) — Engenharia de Software.
 Evolução do sistema **PediuPatrão** de uma pizzaria: perfis de acesso, fluxo controlado de pedidos,
 descontos e cancelamentos exclusivos do gerente e auditoria persistente no MongoDB.
 
-**Tecnologias:** Java 21 · Spring Boot 3.4 · Spring Security 6 · Spring Data MongoDB · Thymeleaf · JUnit 5/Mockito
+**Tecnologias:** Java 21 · Spring Boot 3.4 · Spring Security 6 · Spring Data MongoDB · Thymeleaf · Chart.js · JUnit 5/Mockito
+
+## Dashboard Administrativo (Atividade M2)
+
+Painel em `/dashboard` (perfis ADMIN e GERENTE) com indicadores de vendas, gráficos, situação dos pedidos,
+produtos mais vendidos e filtros, alimentado pela API `GET /api/dashboard/*`.
+
+**Documentação completa:** [docs/DASHBOARD.md](docs/DASHBOARD.md) — requisitos funcionais e não funcionais,
+documentação dos endpoints (parâmetros, exemplos de requisição/resposta e erros), decisões de projeto e
+evidências de testes.
+
+| Variável | Padrão | Uso |
+|----------|--------|-----|
+| `SEED_PEDIDOS_DEMO` | `true` | Gera, uma única vez, 60 dias de pedidos de demonstração para o dashboard |
 
 ---
 
@@ -51,7 +64,7 @@ Criados automaticamente na primeira execução (com cardápio básico de produto
 ```bash
 ./mvnw test
 ```
-38 testes: regras do pedido, serviços, auditoria (incluindo detecção de adulteração) e autorização das APIs.
+55 testes: regras do pedido, serviços, auditoria (incluindo detecção de adulteração), autorização das APIs e dashboard.
 
 ---
 

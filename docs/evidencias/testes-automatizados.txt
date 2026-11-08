@@ -1,0 +1,16 @@
+PediuPatrao - testes automatizados (JUnit 5 + Mockito + Spring Security Test)
+Executado em: 08/11/2026 12:11:27  |  Comando: mvnw test  |  JDK 21
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.config.DemoDataInitializerTest
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.entity.PedidoTest
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.security.DashboardApiTest
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.security.SegurancaApiTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.security.SegurancaServicoTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.service.AuditoriaServiceTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.service.ClienteServiceTest
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.service.DashboardServiceTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.service.PedidoServiceTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0 -- in com.umc.pediupatrao.service.UsuarioServiceTest
+Tests run: 55, Failures: 0, Errors: 0, Skipped: 0
+
+BUILD SUCCESS
